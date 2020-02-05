@@ -7,7 +7,7 @@ public class DropShadow : MonoBehaviour
 {
     private const string _SHADOW_OBJ_NAME = " Drop Shadow";
     [SerializeField] private Vector2 _shadowOffset = new Vector2(2.0f, 0);
-    [SerializeField] private Color _initialShadowColor = new Color(0.0f, 0.0f, 0.0f, 150.0f);
+    [SerializeField] private Color _initialShadowColor = new Color(0.0f, 0.0f, 0.0f, 0.150f);
 
     private SpriteRenderer _targetSpriteRenderer;
     private SpriteRenderer _shadowSpriteRenderer;

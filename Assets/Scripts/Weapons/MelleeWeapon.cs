@@ -4,6 +4,7 @@ using UnityEngine;
 [RequireComponent(typeof(Collider2D))]
 public abstract class MelleeWeapon : MonoBehaviour
 {
+    [SerializeField] private GameObject _selfPrefab = null;
     [SerializeField] private float _staminaConsumptionSpeed = 5.0f;
     [SerializeField] private float _baseDamage = 1.0f;
     [SerializeField] private float _maxRotationSpeed = 900.0f;
@@ -11,6 +12,8 @@ public abstract class MelleeWeapon : MonoBehaviour
     [SerializeField] private float _rotationFalloffFactor = 2.0f;
     [SerializeField] private bool _exponentialSpeed = false;
     private Collider2D _selfCol;
+    private TrailRenderer _tr;
+    private float _maxTrailTime;
 
     private bool _spinning;
     private float _currentRotationSpeed;
@@ -25,11 +28,16 @@ public abstract class MelleeWeapon : MonoBehaviour
 
         _selfCol = GetComponent<Collider2D>();
         _selfCol.isTrigger = true;
+        _tr = GetComponentInChildren<TrailRenderer>();
+        _maxTrailTime = _tr.time;
+
+        _SwordBehaviour += UpdateCurrentAcceleration;
+        _SwordBehaviour += RotateArround;
+        _SwordBehaviour += UpdateTrail;
     }
     protected virtual void Update()
     {
-        UpdateCurrentAcceleration();
-        RotateArround();
+        _SwordBehaviour?.Invoke();
     }
 
     public void SpinHeld()
@@ -80,7 +88,12 @@ public abstract class MelleeWeapon : MonoBehaviour
         _currentRotationSpeed - _rotationAcceleration * _rotationFalloffFactor * Time.deltaTime;
     }
 
-    private void OnTriggerStay2D(Collider2D other)
+    private void UpdateTrail()
+    {
+        _tr.time = (_maxTrailTime * _currentRotationSpeed) / _maxRotationSpeed;
+    }
+
+    private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.tag == "Attackable")
             OnAttackableCollision(other.gameObject);
@@ -89,8 +102,9 @@ public abstract class MelleeWeapon : MonoBehaviour
 
     protected virtual void OnAttackableCollision(GameObject go)
     {
-        Debug.Log("Attackable Collision");
+        go.GetComponent<Entity>().Hit(GetFinalDamage);
     }
 
     private Action _AccelerationCalculation;
+    private Action _SwordBehaviour;
 }

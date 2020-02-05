@@ -42,7 +42,7 @@ public class Player : Entity
         _inputMaster.Player.WeaponSpin.performed += ctx => _weaponSpinAxis = ctx.ReadValue<float>();
     }
 
-    protected override void OnHit()
+    protected override void OnHit(float dmg)
     {
     }
 
@@ -87,7 +87,10 @@ public class Player : Entity
     {
 		_stamina -= _mellee.StaminaConsumptionSpeed * Time.deltaTime;
 		if (_stamina < 0) _stamina = 0;
+        _pUIMngr.RefillingStamina = false;
 
+
+        _pUIMngr.Depleeting = true;
 		_pUIMngr.UpdateStaminaFill(_stamina / _maxStamina);
 
         _mellee.SpinHeld();
@@ -97,7 +100,9 @@ public class Player : Entity
     {
 		_stamina += _staminaRegenSpeed * Time.deltaTime;
 		if (_stamina > 100) _stamina = 100;
+        _pUIMngr.RefillingStamina = _stamina < 100;
 
+        _pUIMngr.Depleeting = false;
 		_pUIMngr.UpdateStaminaFill(_stamina / _maxStamina);
 
         _mellee.SpinNotHeld();
@@ -107,12 +112,14 @@ public class Player : Entity
 	{
 		_depletedState = true;
 		_stamina = 0;
+        _pUIMngr.RefillingStamina = true;
 	}
 
 	private void StaminaRestored()
 	{
 		_depletedState = false;
 		_stamina = 100;
+        _pUIMngr.RefillingStamina = false;
 	}
 
     private void OnEnable()

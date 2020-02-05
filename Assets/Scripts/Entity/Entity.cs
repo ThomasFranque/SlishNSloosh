@@ -17,10 +17,10 @@ public abstract class Entity : MonoBehaviour
         _selfCol = GetComponent<Collider2D>();
     }
 
-    public void Hit()
+    public void Hit(float dmg)
     {
-        OnHit();
+        OnHit(dmg);
     }
 
-    protected abstract void OnHit();
+    protected abstract void OnHit(float dmg);
 }
