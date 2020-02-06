@@ -6,7 +6,7 @@ using UnityEngine;
 public class DropShadow : MonoBehaviour
 {
     private const string _SHADOW_OBJ_NAME = " Drop Shadow";
-    [SerializeField] private Vector2 _shadowOffset = new Vector2(2.0f, 0);
+    [SerializeField] private Vector2 _shadowOffsets = new Vector2(2.0f, .0f);
     [SerializeField] private Color _initialShadowColor = new Color(0.0f, 0.0f, 0.0f, 0.150f);
 
     private SpriteRenderer _targetSpriteRenderer;
@@ -45,7 +45,7 @@ public class DropShadow : MonoBehaviour
     private void UpdateDropShadow()
     {
         _shadowSpriteRenderer.transform.position = 
-            _targetSpriteRenderer.transform.position + (Vector3)_shadowOffset;
+            _targetSpriteRenderer.transform.position + (Vector3)_shadowOffsets;
         _shadowSpriteRenderer.sprite = _targetSpriteRenderer.sprite;
     }
 

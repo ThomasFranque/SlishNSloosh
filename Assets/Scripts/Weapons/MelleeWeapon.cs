@@ -5,11 +5,12 @@ using UnityEngine;
 public abstract class MelleeWeapon : MonoBehaviour
 {
     [SerializeField] private GameObject _selfPrefab = null;
-    [SerializeField] private float _staminaConsumptionSpeed = 5.0f;
-    [SerializeField] private float _baseDamage = 1.0f;
+    [SerializeField] private float _staminaConsumptionSpeed = 15.0f;
+    [SerializeField] private float _baseDamage = 10.0f;
+    [SerializeField] private float _knockBackIntensity = 180.0f;
     [SerializeField] private float _maxRotationSpeed = 900.0f;
     [SerializeField] private float _rotationAcceleration = 80.0f;
-    [SerializeField] private float _rotationFalloffFactor = 2.0f;
+    [SerializeField] private float _rotationFalloffFactor = 3.0f;
     [SerializeField] private bool _exponentialSpeed = false;
 
     [Tooltip("Should update rotation (true) or use the parent (false)?")]
@@ -23,16 +24,26 @@ public abstract class MelleeWeapon : MonoBehaviour
     private bool _spinning;
     private float _currentRotationSpeed;
 
-    public float StaminaConsumptionSpeed => _staminaConsumptionSpeed * (_currentRotationSpeed / _maxRotationSpeed);
+    public float StaminaConsumptionSpeed => _staminaConsumptionSpeed * SpeedFactor;
+
+    protected float SpeedFactor =>  _currentRotationSpeed / _maxRotationSpeed;
+
     protected float GetFinalDamage
     {
         get
         {
-            float speedFactor = _currentRotationSpeed / _maxRotationSpeed;
-            float finalDmg = _baseDamage * speedFactor;
+            float finalDmg = _baseDamage * SpeedFactor;
             finalDmg = Mathf.Clamp(finalDmg, 1, Mathf.Infinity);
 
             return finalDmg;
+        }
+    }
+    protected float GetFinalKnockBackIntensity
+    {
+        get
+        {
+            float finalKnock = _knockBackIntensity * SpeedFactor;
+            return finalKnock;
         }
     }
 
@@ -141,13 +152,17 @@ public abstract class MelleeWeapon : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.tag == "Attackable")
-            OnAttackableCollision(other.gameObject);
+        {
+            Vector2 hitDirection = (other.transform.position - transform.parent.transform.position).normalized;
+            Debug.DrawRay(other.transform.position, hitDirection * GetFinalKnockBackIntensity, Color.red, 0.3f);
+            OnAttackableCollision(other.gameObject, hitDirection);
+        }
 
     }
 
-    protected virtual void OnAttackableCollision(GameObject go)
+    protected virtual void OnAttackableCollision(GameObject go, Vector2 hitDirection)
     {
-        go.GetComponent<Entity>().Hit(GetFinalDamage);
+        go.GetComponent<Entity>().Hit(GetFinalDamage, hitDirection, GetFinalKnockBackIntensity);
     }
 
     private Action _AccelerationCalculation;

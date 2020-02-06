@@ -22,10 +22,4 @@ public class HitText : MonoBehaviour
     {
         transform.position = Vector3.Lerp(transform.position, _newPos, Time.deltaTime * _risingSpeed);
     }
-
-    private void OnDrawGizmos() 
-    {
-        Gizmos.color = Color.black;    
-        Gizmos.DrawLine(transform.position, transform.position + new Vector3(transform.position.x, transform.position.y + _yOffset, 0));
-    }
 }

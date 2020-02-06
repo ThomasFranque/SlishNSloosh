@@ -136,7 +136,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a778f47b5e70747b5c0047220ff510, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _shadowOffset: {x: 2, y: 0}
+  _shadowOffsets: {x: 2, y: 0}
   _initialShadowColor: {r: 0, g: 0, b: 0, a: 0.5882353}
 --- !u!212 &2947599644294208849
 SpriteRenderer:
@@ -239,6 +239,7 @@ MonoBehaviour:
   _selfPrefab: {fileID: 2947599644398521169}
   _staminaConsumptionSpeed: 15
   _baseDamage: 10
+  _knockBackIntensity: 180
   _maxRotationSpeed: 900
   _rotationAcceleration: 80
   _rotationFalloffFactor: 3
@@ -397,7 +398,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a778f47b5e70747b5c0047220ff510, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _shadowOffset: {x: 2, y: 0}
+  _shadowOffsets: {x: 2, y: 0}
   _initialShadowColor: {r: 0, g: 0, b: 0, a: 0.5882353}
 --- !u!1 &2947599644578961231
 GameObject:

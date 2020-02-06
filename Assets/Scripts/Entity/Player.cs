@@ -20,7 +20,6 @@ public class Player : Entity
     private MelleeWeapon _mellee;
     private InputManager _inputMaster;
 	private PlayerUIManager _pUIMngr;
-	private Animator _gfxAnim;
 
     private bool SpinIntention => _weaponSpinAxis != 0;
 
@@ -35,14 +34,13 @@ public class Player : Entity
         _stamina = _maxStamina;
         _mellee = GetComponentInChildren<MelleeWeapon>();
 		_pUIMngr = GetComponent<PlayerUIManager>();
-		_gfxAnim = GetComponentInChildren<Animator>();
         moveAxis = Vector2.zero;
         _inputMaster = new InputManager();
         _inputMaster.Player.Movement.performed += ctx => moveAxis = ctx.ReadValue<Vector2>();
         _inputMaster.Player.WeaponSpin.performed += ctx => _weaponSpinAxis = ctx.ReadValue<float>();
     }
 
-    protected override void OnHit(float dmg)
+    protected override void OnHit(float dmg, Vector2 hitDirection, float knockBackIntensity)
     {
     }
 
@@ -66,7 +64,7 @@ public class Player : Entity
 
     private void FixedUpdate()
     {
-        Vector2 newVelocity = _rb.velocity;
+        Vector2 newVelocity = GetRigidBodyVelocity();
         Vector2 inputAxis = Vector2.ClampMagnitude(moveAxis, 1.0f);
 
         newVelocity.x += _acceleration * inputAxis.x;
@@ -75,12 +73,12 @@ public class Player : Entity
         if (Mathf.Abs(newVelocity.x) > _maxSpeed) newVelocity.x = _maxSpeed * Mathf.Sign(newVelocity.x);
         if (Mathf.Abs(newVelocity.y) > _maxSpeed) newVelocity.y = _maxSpeed * Mathf.Sign(newVelocity.y);
 
-        _rb.velocity = newVelocity;
+        SetRigidBodyVelocity(newVelocity);
     }
 
 	private void UpdateGFXAnimator()
 	{
-		_gfxAnim.SetBool("Walking", Mathf.Abs(moveAxis.x) > 0 || Mathf.Abs(moveAxis.y) > 0);
+		_entityVisuals.GfxAnim.SetBool("Walking", Mathf.Abs(moveAxis.x) > 0 || Mathf.Abs(moveAxis.y) > 0);
 	}
 
     private void SpiningWeapon()
