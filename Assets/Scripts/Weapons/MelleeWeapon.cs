@@ -11,6 +11,11 @@ public abstract class MelleeWeapon : MonoBehaviour
     [SerializeField] private float _rotationAcceleration = 80.0f;
     [SerializeField] private float _rotationFalloffFactor = 2.0f;
     [SerializeField] private bool _exponentialSpeed = false;
+
+    [Tooltip("Should update rotation (true) or use the parent (false)?")]
+    [SerializeField] private bool _isMainWeapon = false;
+
+    private MelleeWeapon _parentWeapon;
     private Collider2D _selfCol;
     private TrailRenderer _tr;
     private float _maxTrailTime;
@@ -19,7 +24,17 @@ public abstract class MelleeWeapon : MonoBehaviour
     private float _currentRotationSpeed;
 
     public float StaminaConsumptionSpeed => _staminaConsumptionSpeed * (_currentRotationSpeed / _maxRotationSpeed);
-    protected float GetFinalDamage => _baseDamage;
+    protected float GetFinalDamage
+    {
+        get
+        {
+            float speedFactor = _currentRotationSpeed / _maxRotationSpeed;
+            float finalDmg = _baseDamage * speedFactor;
+            finalDmg = Mathf.Clamp(finalDmg, 1, Mathf.Infinity);
+
+            return finalDmg;
+        }
+    }
 
     private void Awake()
     {
@@ -31,10 +46,35 @@ public abstract class MelleeWeapon : MonoBehaviour
         _tr = GetComponentInChildren<TrailRenderer>();
         _maxTrailTime = _tr.time;
 
-        _SwordBehaviour += UpdateCurrentAcceleration;
-        _SwordBehaviour += RotateArround;
+        if (_isMainWeapon)
+        {
+            _SwordBehaviour += UpdateCurrentAcceleration;
+            _SwordBehaviour += RotateArround;
+        }
+        else
+        {
+            FindParentWeapon();
+            _SwordBehaviour += GetParentWeaponCurrentSpeed;
+        }
+
         _SwordBehaviour += UpdateTrail;
     }
+
+    private void FindParentWeapon()
+    {
+        MelleeWeapon[] mellees = GetComponentsInParent<MelleeWeapon>();
+        for (int i = 0; i < mellees.Length; i++)
+        {
+            if (mellees[i].transform == transform.parent)
+            {
+                _parentWeapon = mellees[i];
+                return;
+            }
+        }
+
+        Debug.LogError($"Parent Weapon not found on: {name} !");
+    }
+
     protected virtual void Update()
     {
         _SwordBehaviour?.Invoke();
@@ -69,9 +109,14 @@ public abstract class MelleeWeapon : MonoBehaviour
     private void UpdateCurrentAcceleration()
     {
         _AccelerationCalculation?.Invoke();
-        
+
         if (_currentRotationSpeed > _maxRotationSpeed) _currentRotationSpeed = _maxRotationSpeed;
         else if (_currentRotationSpeed < 0) _currentRotationSpeed = 0;
+    }
+
+    private void GetParentWeaponCurrentSpeed()
+    {
+        _currentRotationSpeed = _parentWeapon._currentRotationSpeed;
     }
 
     private void AccelerationExponentialIncrease()

@@ -15,7 +15,6 @@ public class BackgroundSpawner : MonoBehaviour
 
     private void Spawn()
     {
-
         Vector3Int startPivot = Vector3Int.zero;
         startPivot.x = -(amountOfTiles.x / 2 * _spritePixels);
         startPivot.y = -(amountOfTiles.y / 2 * _spritePixels);

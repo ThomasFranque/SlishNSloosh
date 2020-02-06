@@ -9,5 +9,8 @@ public class Enemy : Entity
     protected override void OnHit(float dmg)
     {
         Instantiate(_hitText, transform.position, Quaternion.identity);
+        DealDamage(dmg);
     }
+
+    
 }

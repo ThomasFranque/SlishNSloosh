@@ -16,6 +16,8 @@ public class DropShadow : MonoBehaviour
     {
         _targetSpriteRenderer = GetComponent<SpriteRenderer>();
         _shadowSpriteRenderer = SpawnDropShadow();
+        
+        _shadowSpriteRenderer.transform.rotation = _targetSpriteRenderer.transform.rotation;
 
         UpdateDropShadow();
     }
